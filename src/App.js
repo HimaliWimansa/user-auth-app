@@ -1,27 +1,40 @@
+// src/App.js
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import Dashboard from "./components/Dashboard";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Signup from "./components/Signup";
 import Login from "./components/Login";
-import { AuthProvider } from "./contexts/AuthContext";
 import ForgotPassword from "./components/ForgotPassword";
+import Dashboard from "./components/Dashboard";
+import { AuthProvider } from "./contexts/AuthContext";
+import PrivateRoute from "./components/PrivateRoute";
+import Navbar from "./components/Navbar";
+import Home from "./components/Home"; // import Home here
+
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <Navbar />
-        <div className="container mt-4">
-          <Routes>
-            <Route path="/" element={<h1>Welcome to the Water Quality App</h1>} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-          </Routes>
-        </div>
-      </Router>
-    </AuthProvider>
+        <Routes>
+          {/* ✅ Home route should be PUBLIC */}
+          <Route path="/home" element={<Home />} />
+
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          
+          {/* ✅ Dashboard should stay protected */}
+          <Route
+            path="/"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
+      </AuthProvider>
+    </Router>
   );
 }
 

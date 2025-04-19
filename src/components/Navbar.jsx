@@ -1,14 +1,29 @@
+// src/components/Navbar.jsx
 import React from "react";
-import { Link } from "react-router-dom";
-import { FaHome, FaChartBar, FaSignInAlt, FaUserPlus } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { FaHome, FaSignInAlt, FaUserPlus, FaTachometerAlt, FaSignOutAlt } from "react-icons/fa";
 
-const Navbar = () => {
+export default function Navbar() {
+  const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    try {
+      await logout();
+      navigate("/login");
+    } catch (error) {
+      console.error("Failed to logout:", error);
+    }
+  }
+
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
-      <div className="container-fluid">
-        <Link className="navbar-brand text-primary fs-3 fw-bold" to="/">
-          Water Quality Dashboard
+    <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div className="container">
+        <Link className="navbar-brand fw-bold" to="/">
+          💧 Water Quality App
         </Link>
+
         <button
           className="navbar-toggler"
           type="button"
@@ -20,33 +35,55 @@ const Navbar = () => {
         >
           <span className="navbar-toggler-icon"></span>
         </button>
+
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto">
-            <li className="nav-item">
-              <Link className="nav-link" to="/">
-                <FaHome className="me-2" /> Home
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/dashboard">
-                <FaChartBar className="me-2" /> Dashboard
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/login">
-                <FaSignInAlt className="me-2" /> Log In
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/signup">
-                <FaUserPlus className="me-2" /> Sign Up
-              </Link>
-            </li>
+            {/* Only show Dashboard link if logged in */}
+            {currentUser && (
+              <li className="nav-item">
+                <Link to="/" className="nav-link">
+                  <FaTachometerAlt className="me-1" /> Dashboard
+                </Link>
+              </li>
+            )}
+            {/* Show Home link only if NOT logged in */}
+            {!currentUser && (
+              <li className="nav-item">
+                <Link to="/home" className="nav-link">
+                  <FaHome className="me-1" /> Home
+                </Link>
+              </li>
+            )}
+            {/* Show Login and Signup if NOT logged in */}
+            {!currentUser && (
+              <>
+                <li className="nav-item">
+                  <Link to="/login" className="nav-link">
+                    <FaSignInAlt className="me-1" /> Login
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link to="/signup" className="nav-link">
+                    <FaUserPlus className="me-1" /> Sign Up
+                  </Link>
+                </li>
+              </>
+            )}
+            {/* Logout button if logged in */}
+            {currentUser && (
+              <li className="nav-item">
+                <button
+                  onClick={handleLogout}
+                  className="btn btn-link nav-link"
+                  style={{ color: "white", textDecoration: "none" }}
+                >
+                  <FaSignOutAlt className="me-1" /> Logout
+                </button>
+              </li>
+            )}
           </ul>
         </div>
       </div>
     </nav>
   );
-};
-
-export default Navbar;
+}

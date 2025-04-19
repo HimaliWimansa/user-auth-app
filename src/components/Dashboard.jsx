@@ -1,30 +1,46 @@
+// src/components/Dashboard.jsx
 import React from "react";
-import Charts from "./charts";
 import { useAuth } from "../contexts/AuthContext";
+import Charts from "./charts";
 import { useNavigate } from "react-router-dom";
 import { FaSignOutAlt } from "react-icons/fa";
 
 export default function Dashboard() {
-  const { logout } = useAuth();
+  const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
 
   async function handleLogout() {
-    await logout();
-    navigate("/login");
+    try {
+      await logout();
+      navigate("/login");
+    } catch (error) {
+      console.error("Failed to logout:", error);
+    }
   }
 
   return (
     <div className="container mt-5">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h4 className="text-primary fs-2">Water Quality Dashboard</h4>
-        <button
-          className="btn btn-danger d-flex align-items-center"
-          onClick={handleLogout}
-        >
-          <FaSignOutAlt className="me-2" /> Log Out
-        </button>
+      <div className="p-4 bg-white rounded shadow-sm mb-4">
+        <div className="d-flex justify-content-between align-items-center">
+          <div>
+            <h2 className="text-success fw-bold">📊 Water Quality Dashboard</h2>
+            {currentUser && (
+              <p className="lead">
+                Welcome, <strong>{currentUser.email}</strong>!
+              </p>
+            )}
+          </div>
+          <button
+            className="btn btn-danger d-flex align-items-center"
+            onClick={handleLogout}
+          >
+            <FaSignOutAlt className="me-2" /> Logout
+          </button>
+        </div>
       </div>
-      <charts />
+
+      {/* Charts Section */}
+      <Charts />
     </div>
   );
 }
