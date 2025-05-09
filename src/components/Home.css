@@ -1,0 +1,13 @@
+/* src/components/Home.css */
+
+.home-background {
+    background-image: url("C:\Users\USER\user-auth-app\public\water.jpg"); /* Note: start with slash */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  

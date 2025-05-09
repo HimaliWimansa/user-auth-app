@@ -23,23 +23,54 @@ export default function Signup() {
   }
 
   return (
-    <div className="container d-flex align-items-center justify-content-center" style={{ minHeight: "80vh" }}>
-      <div className="card p-4 shadow" style={{ minWidth: "350px" }}>
-        <h2 className="text-center mb-4 text-primary">
+    <div
+      className="d-flex align-items-center justify-content-center"
+      style={{
+        minHeight: "100vh",
+        backgroundImage: 'url("/water.jpg")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <div
+        className="p-4 shadow rounded"
+        style={{
+          minWidth: "350px",
+          backgroundColor: "rgba(255, 255, 255, 0.85)",
+          borderRadius: "15px",
+          boxShadow: "0 4px 15px rgba(0, 0, 0, 0.3)",
+          color: "rgb(8, 8, 7)",
+        }}
+      >
+        <h2 className="text-center mb-4" style={{ color: "rgb(30, 29, 25)" }}>
           <FaUserPlus className="me-2" /> Sign Up
         </h2>
         {error && <div className="alert alert-danger">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group mb-3">
-            <input type="email" ref={emailRef} required className="form-control" placeholder="Enter Email" />
+            <input
+              type="email"
+              ref={emailRef}
+              required
+              className="form-control"
+              placeholder="Enter Email"
+            />
           </div>
           <div className="form-group mb-4">
-            <input type="password" ref={passwordRef} required className="form-control" placeholder="Enter Password" />
+            <input
+              type="password"
+              ref={passwordRef}
+              required
+              className="form-control"
+              placeholder="Enter Password"
+            />
           </div>
-          <button type="submit" className="btn btn-primary w-100 mb-3">Sign Up</button>
+          <button type="submit" className="btn btn-primary w-100 mb-3">
+            Sign Up
+          </button>
         </form>
         <div className="text-center">
-          Already have an account? <Link to="/login">Log In</Link>
+          Already have an account? <Link to="/login" className="text-primary">Log In</Link>
         </div>
       </div>
     </div>
