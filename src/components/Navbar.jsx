@@ -25,28 +25,35 @@ export default function Navbar() {
 
   return (
     <nav
-      className="navbar navbar-expand-lg"
-      style={{ backgroundColor: "rgb(30, 29, 25)", color: "white" }}
+      className="navbar navbar-expand-lg shadow-sm"
+      style={{
+        backgroundColor: "rgb(30, 29, 25)",
+        color: "white",
+        padding: "12px 0",
+      }}
     >
       <div className="container">
-        <Link className="navbar-brand fw-bold text-white" to="/">
-           Water Quality Monitoring System
+        <Link className="navbar-brand fw-bold text-white" to="/" style={{ fontSize: "1.25rem" }}>
+          Water Quality Monitoring System
         </Link>
 
         <button
-          className="navbar-toggler bg-white"
+          className="navbar-toggler"
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarNav"
           aria-controls="navbarNav"
           aria-expanded="false"
           aria-label="Toggle navigation"
+          style={{
+            borderColor: "white",
+          }}
         >
-          <span className="navbar-toggler-icon"></span>
+          <span className="navbar-toggler-icon" style={{ filter: "invert(1)" }}></span>
         </button>
 
         <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto">
+          <ul className="navbar-nav ms-auto align-items-center">
             {currentUser && (
               <li className="nav-item">
                 <Link to="/" className="nav-link text-white">
@@ -55,14 +62,12 @@ export default function Navbar() {
               </li>
             )}
             {!currentUser && (
-              <li className="nav-item">
-                <Link to="/home" className="nav-link text-white">
-                  <FaHome className="me-1" /> Home
-                </Link>
-              </li>
-            )}
-            {!currentUser && (
               <>
+                <li className="nav-item">
+                  <Link to="/home" className="nav-link text-white">
+                    <FaHome className="me-1" /> Home
+                  </Link>
+                </li>
                 <li className="nav-item">
                   <Link to="/login" className="nav-link text-white">
                     <FaSignInAlt className="me-1" /> Login
@@ -80,7 +85,10 @@ export default function Navbar() {
                 <button
                   onClick={handleLogout}
                   className="btn btn-link nav-link text-white"
-                  style={{ textDecoration: "none" }}
+                  style={{
+                    textDecoration: "none",
+                    fontWeight: "500",
+                  }}
                 >
                   <FaSignOutAlt className="me-1" /> Logout
                 </button>

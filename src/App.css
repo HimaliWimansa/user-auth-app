@@ -48,3 +48,10 @@ a {
 .navbar .nav-link:hover {
   color: #ccc !important;
 }
+.nav-link {
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #ccc !important;
+}

@@ -75,7 +75,10 @@ export default function Login() {
           </Link>
         </div>
         <div className="text-center mt-2">
-          Need an account? <Link to="/signup" className="text-primary">Sign Up</Link>
+          Need an account? <Link to="/signup" style={{ color: "rgb(162, 65, 38)" }}>
+  Sign Up
+</Link>
+
         </div>
       </div>
     </div>

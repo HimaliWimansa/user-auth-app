@@ -67,7 +67,7 @@ export default function ForgotPassword() {
           </button>
         </form>
         <div className="text-center">
-          <Link to="/login" className="text-primary">Back to Log In</Link>
+          <Link to="/login" style={{ color: "rgb(162, 65, 38)" }}>Back to Log In</Link>
         </div>
       </div>
     </div>

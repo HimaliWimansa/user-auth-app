@@ -4,11 +4,11 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Signup from "./components/Signup";
 import Login from "./components/Login";
 import ForgotPassword from "./components/ForgotPassword";
-import Dashboard from "./components/Dashboard";
+import Charts from "./components/charts";
+import Home from "./components/Home";
 import { AuthProvider } from "./contexts/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
 import Navbar from "./components/Navbar";
-import Home from "./components/Home"; // import Home here
 
 function App() {
   return (
@@ -16,19 +16,15 @@ function App() {
       <AuthProvider>
         <Navbar />
         <Routes>
-          {/* ✅ Home route should be PUBLIC */}
-          <Route path="/home" element={<Home />} />
-
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          
-          {/* ✅ Dashboard should stay protected */}
+          <Route path="/home" element={<Home />} />
           <Route
             path="/"
             element={
               <PrivateRoute>
-                <Dashboard />
+                <Charts />
               </PrivateRoute>
             }
           />

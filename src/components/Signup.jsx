@@ -70,7 +70,7 @@ export default function Signup() {
           </button>
         </form>
         <div className="text-center">
-          Already have an account? <Link to="/login" className="text-primary">Log In</Link>
+          Already have an account? <Link to="/login"  style={{ color: "rgb(162, 65, 38)" }} >Log In</Link>
         </div>
       </div>
     </div>

@@ -6,13 +6,16 @@ import "./Home.css";
 export default function Home() {
   return (
     <div className="home-background">
-      <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
+      <div
+        className="container d-flex justify-content-center align-items-center"
+        style={{ minHeight: "100vh", paddingTop: "60px", paddingBottom: "80px" }}
+      >
         <div
           className="text-center p-5"
           style={{
             maxWidth: "800px",
-            backgroundColor: "rgba(255, 255, 255, 0.67)",
-            backdropFilter: "blur(10px)",
+            backgroundColor: "rgba(255, 255, 255, 0.75)",
+            backdropFilter: "blur(1px)",
             borderRadius: "15px",
             boxShadow: "0 8px 20px rgba(0, 0, 0, 0.2)",
             color: "rgb(8, 8, 7)",
