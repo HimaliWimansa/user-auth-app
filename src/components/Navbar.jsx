@@ -30,10 +30,15 @@ export default function Navbar() {
         backgroundColor: "rgb(30, 29, 25)",
         color: "white",
         padding: "12px 0",
+        fontFamily: "'Poppins', sans-serif",
       }}
     >
       <div className="container">
-        <Link className="navbar-brand fw-bold text-white" to="/" style={{ fontSize: "1.25rem" }}>
+        <Link
+          className="navbar-brand text-white"
+          to="/"
+          style={{ fontSize: "1.25rem" }}
+        >
           Water Quality Monitoring System
         </Link>
 
@@ -49,7 +54,10 @@ export default function Navbar() {
             borderColor: "white",
           }}
         >
-          <span className="navbar-toggler-icon" style={{ filter: "invert(1)" }}></span>
+          <span
+            className="navbar-toggler-icon"
+            style={{ filter: "invert(1)" }}
+          ></span>
         </button>
 
         <div className="collapse navbar-collapse" id="navbarNav">
