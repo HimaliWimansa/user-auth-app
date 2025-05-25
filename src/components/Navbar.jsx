@@ -50,25 +50,31 @@ export default function Navbar() {
           aria-controls="navbarNav"
           aria-expanded="false"
           aria-label="Toggle navigation"
-          style={{
-            borderColor: "white",
-          }}
+          style={{ borderColor: "white" }}
         >
-          <span
-            className="navbar-toggler-icon"
-            style={{ filter: "invert(1)" }}
-          ></span>
+          <span className="navbar-toggler-icon" style={{ filter: "invert(1)" }}></span>
         </button>
 
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto align-items-center">
+
+            {/* Links for logged-in users */}
             {currentUser && (
-              <li className="nav-item">
-                <Link to="/" className="nav-link text-white">
-                  <FaTachometerAlt className="me-1" /> Dashboard
-                </Link>
-              </li>
+              <>
+                <li className="nav-item">
+                  <Link to="/" className="nav-link text-white">
+                    <FaTachometerAlt className="me-1" /> Dashboard
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link to="/report" className="nav-link text-white">
+                    📄 Report
+                  </Link>
+                </li>
+              </>
             )}
+
+            {/* Links for guests */}
             {!currentUser && (
               <>
                 <li className="nav-item">
@@ -88,15 +94,14 @@ export default function Navbar() {
                 </li>
               </>
             )}
+
+            {/* Logout button */}
             {currentUser && (
               <li className="nav-item">
                 <button
                   onClick={handleLogout}
                   className="btn btn-link nav-link text-white"
-                  style={{
-                    textDecoration: "none",
-                    fontWeight: "500",
-                  }}
+                  style={{ textDecoration: "none", fontWeight: "500" }}
                 >
                   <FaSignOutAlt className="me-1" /> Logout
                 </button>
