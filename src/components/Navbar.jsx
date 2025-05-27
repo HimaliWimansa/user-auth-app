@@ -71,6 +71,17 @@ export default function Navbar() {
                     📄 Report
                   </Link>
                 </li>
+                {currentUser && (
+  <>
+    
+    <li className="nav-item">
+      <Link to="/prediction" className="nav-link text-white">
+        🔍 Prediction
+      </Link>
+    </li>
+  </>
+)}
+
               </>
             )}
 

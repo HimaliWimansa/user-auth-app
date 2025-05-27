@@ -10,6 +10,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
 import Navbar from "./components/Navbar";
 import ReportGenerator from "./components/ReportGenerator";
+import Prediction from "./components/Prediction";
 
 function App() {
   return (
@@ -21,9 +22,26 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/home" element={<Home />} />
-          <Route path="/report" element={<ReportGenerator />} />
-        <Route path="/report" element={<ReportGenerator />} />
 
+          {/* Protected Routes */}
+          <Route
+            path="/report"
+            element={
+              <PrivateRoute>
+                <ReportGenerator />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/prediction"
+            element={
+              <PrivateRoute>
+                <Prediction />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Dashboard (default route) */}
           <Route
             path="/"
             element={
