@@ -21,28 +21,41 @@ export default function ReportGenerator() {
       const raw = snapshot.val();
       if (!raw) return;
 
+      // Find latest full datetime in dataset for date inference
+      const fullDateEntries = Object.values(raw)
+        .filter((e) => typeof e.Date_Time === "string" && e.Date_Time.includes("-"))
+        .map((e) => e.Date_Time)
+        .sort();
+
+      const latestFullDateTime = fullDateEntries.length ? fullDateEntries[fullDateEntries.length - 1] : null;
+      const inferredDate = latestFullDateTime ? latestFullDateTime.split(" ")[0] : new Date().toISOString().split("T")[0];
+
       const entries = Object.values(raw).map((entry) => {
         let dt = entry.Date_Time;
 
-        if (/^\d{2}:\d{2}:\d{2}$/.test(dt)) {
-          const fullDateEntry = Object.values(raw)
-            .filter((e) => e.Date_Time?.includes("-"))
-            .map((e) => e.Date_Time)
-            .sort()
-            .pop();
-          const inferredDate = fullDateEntry?.split(" ")[0] || new Date().toISOString().split("T")[0];
-          dt = `${inferredDate} ${dt}`;
+        if (typeof dt === "string") {
+          // If only time string, add inferred date
+          if (/^\d{2}:\d{2}:\d{2}$/.test(dt)) {
+            dt = `${inferredDate} ${dt}`;
+          }
+
+          const [date, time] = dt.split(" ");
+          const minute = time ? time.slice(0, 5) : "";
+
+          return {
+            ...entry,
+            Date: date,
+            Minute: minute,
+            DateTime: `${date} ${minute}`, // Grouping by minute (ignore seconds)
+          };
+        } else {
+          return {
+            ...entry,
+            Date: "",
+            Minute: "",
+            DateTime: "",
+          };
         }
-
-        const [date, time] = dt.split(" ");
-        const minute = time ? time.slice(0, 5) : dt.slice(11, 16);
-
-        return {
-          ...entry,
-          Date: date,
-          Minute: minute,
-          DateTime: `${date} ${minute}`,
-        };
       });
 
       setData(entries);
@@ -53,14 +66,20 @@ export default function ReportGenerator() {
     const selectedDay = selectedDate.toISOString().split("T")[0];
     const selectedMonth = selectedDay.slice(0, 7);
 
+    // Filter data for selected date
     const daily = data.filter((d) => d.Date === selectedDay);
+
+    // Use Map keyed by DateTime (date + minute) to avoid duplicate records per minute
     const esp8266Map = new Map();
     const esp32Map = new Map();
 
     daily.forEach((entry) => {
+      // Identify ESP8266 data by presence of TDS_Value or Temperature_C
       if ("TDS_Value" in entry || "Temperature_C" in entry) {
+        // If multiple entries in same minute, keep last (or you can customize)
         esp8266Map.set(entry.DateTime, entry);
       }
+      // Identify ESP32 data by presence of PH_Value or Turbidity_Value
       if ("PH_Value" in entry || "Turbidity_Value" in entry) {
         esp32Map.set(entry.DateTime, entry);
       }
@@ -69,10 +88,16 @@ export default function ReportGenerator() {
     setEsp8266Data(Array.from(esp8266Map.values()));
     setEsp32Data(Array.from(esp32Map.values()));
 
+    // Monthly summary filtering by month
     const monthData = data.filter((d) => d.Date?.startsWith(selectedMonth));
 
     const summarize = (field) => {
-      const values = monthData.map((e) => e[field]).filter((v) => typeof v === "number");
+      const values = monthData
+        .map((e) => {
+          const val = e[field];
+          return typeof val === "number" ? val : parseFloat(val); // parse string numbers safely
+        })
+        .filter((v) => !isNaN(v));
       if (values.length === 0) return { avg: "-", min: "-", max: "-" };
       const avg = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2);
       const min = Math.min(...values).toFixed(2);
@@ -98,8 +123,8 @@ export default function ReportGenerator() {
     const month = date.slice(0, 7);
 
     const title = isMonthly
-      ? ` Monthly Water Quality Summary - ${month}`
-      : ` Daily Water Quality Report - ${date}`;
+      ? `Monthly Water Quality Summary - ${month}`
+      : `Daily Water Quality Report - ${date}`;
     doc.text(title, 14, 15);
 
     const formatTable = (title, headers, rows, startY) => {
@@ -136,11 +161,7 @@ export default function ReportGenerator() {
       formatTable(
         "pH + Turbidity",
         ["Time", "pH", "Turbidity"],
-        esp32Data.map((row) => [
-          row.DateTime,
-          row.PH_Value ?? "-",
-          row.Turbidity_Value ?? "-",
-        ]),
+        esp32Data.map((row) => [row.DateTime, row.PH_Value ?? "-", row.Turbidity_Value ?? "-"]),
         doc.lastAutoTable.finalY + 10
       );
     }
@@ -154,7 +175,10 @@ export default function ReportGenerator() {
 
   return (
     <div className="container py-5">
-      <h3 className="mb-4 text-center" style={{ color: "#0d6efd", fontWeight: "bold" }}>📅 Water Quality Report</h3>
+      <h3 className="mb-4 text-center" style={{ color: "#0d6efd", fontWeight: "bold" }}>
+        📅 Water Quality Report
+      </h3>
+
       <div className="mb-4 d-flex justify-content-center">
         <DatePicker
           selected={selectedDate}
@@ -163,19 +187,24 @@ export default function ReportGenerator() {
           dateFormat="yyyy-MM-dd"
         />
         <button
-            onClick={() => downloadPDF(false)}
-                className="btn ms-3"
-              style={{ color: "#0d6efd", fontWeight: "bold", border: "1px solid #0d6efd" }}
+          onClick={() => downloadPDF(false)}
+          className="btn ms-3"
+          style={{ color: "#0d6efd", fontWeight: "bold", border: "1px solid #0d6efd" }}
         >
           📥 Daily Report
         </button>
-        <button onClick={() => downloadPDF(true)} className="btn btn-primary ms-2"
-        style={{ color: "#ff8800", fontWeight: "bold" ,border: "1px solid #ff8800"}}>
+        <button
+          onClick={() => downloadPDF(true)}
+          className="btn btn-primary ms-2"
+          style={{ color: "#ff8800", fontWeight: "bold", border: "1px solid #ff8800" }}
+        >
           📊 Monthly Summary
         </button>
       </div>
 
-      <h5 className="mt-4" style={{ color: "#ff8800", fontWeight: "bold" }}>TDS & Temperature</h5>
+      <h5 className="mt-4" style={{ color: "#ff8800", fontWeight: "bold" }}>
+        TDS & Temperature (ESP8266)
+      </h5>
       <table className="table table-bordered">
         <thead className="table-dark">
           <tr>
@@ -194,12 +223,18 @@ export default function ReportGenerator() {
               </tr>
             ))
           ) : (
-            <tr><td colSpan="3" className="text-center">No data available</td></tr>
+            <tr>
+              <td colSpan="3" className="text-center">
+                No data available
+              </td>
+            </tr>
           )}
         </tbody>
       </table>
 
-      <h5 className="mt-4" style={{ color: "#ff8800", fontWeight: "bold" }}>pH & Turbidity</h5>
+      <h5 className="mt-4" style={{ color: "#ff8800", fontWeight: "bold" }}>
+        pH & Turbidity (ESP32)
+      </h5>
       <table className="table table-bordered">
         <thead className="table-dark">
           <tr>
@@ -218,15 +253,21 @@ export default function ReportGenerator() {
               </tr>
             ))
           ) : (
-            <tr><td colSpan="3" className="text-center">No data available</td></tr>
+            <tr>
+              <td colSpan="3" className="text-center">
+                No data available
+              </td>
+            </tr>
           )}
         </tbody>
       </table>
 
-      <h4 className="mt-5" style={{ color: "#0d6efd", fontWeight: "bold" }}>📊 Monthly Summary ({selectedDate.toISOString().slice(0, 7)})</h4>
+      <h4 className="mt-5" style={{ color: "#0d6efd", fontWeight: "bold" }}>
+        📊 Monthly Summary ({selectedDate.toISOString().slice(0, 7)})
+      </h4>
       <div className="row">
         <div className="col-md-6">
-          <h6 style={{ color: "#ff8800", fontWeight: "bold" }}>TDS & Temperature</h6>
+          <h6 style={{ color: "#ff8800", fontWeight: "bold" }}>TDS & Temperature (ESP8266)</h6>
           <table className="table table-bordered">
             <thead>
               <tr>
@@ -237,19 +278,19 @@ export default function ReportGenerator() {
               </tr>
             </thead>
             <tbody>
-              {monthlySummary.esp8266.map((row, idx) => (
-                <tr key={idx}>
-                  <td>{row.label}</td>
-                  <td>{row.avg}</td>
-                  <td>{row.min}</td>
-                  <td>{row.max}</td>
+              {monthlySummary.esp8266.map((r, i) => (
+                <tr key={i}>
+                  <td>{r.label}</td>
+                  <td>{r.avg}</td>
+                  <td>{r.min}</td>
+                  <td>{r.max}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
         <div className="col-md-6">
-          <h6 style={{ color: "#ff8800", fontWeight: "bold" }}> pH & Turbidity</h6>
+          <h6 style={{ color: "#ff8800", fontWeight: "bold" }}>pH & Turbidity (ESP32)</h6>
           <table className="table table-bordered">
             <thead>
               <tr>
@@ -260,12 +301,12 @@ export default function ReportGenerator() {
               </tr>
             </thead>
             <tbody>
-              {monthlySummary.esp32.map((row, idx) => (
-                <tr key={idx}>
-                  <td>{row.label}</td>
-                  <td>{row.avg}</td>
-                  <td>{row.min}</td>
-                  <td>{row.max}</td>
+              {monthlySummary.esp32.map((r, i) => (
+                <tr key={i}>
+                  <td>{r.label}</td>
+                  <td>{r.avg}</td>
+                  <td>{r.min}</td>
+                  <td>{r.max}</td>
                 </tr>
               ))}
             </tbody>
